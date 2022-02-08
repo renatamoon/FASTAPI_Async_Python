@@ -1,7 +1,46 @@
 from fastapi import FastAPI
-from .domain.models import Product
-from .infraestructure.mongo import database, collection, product_helpers
-from bson.objectid import ObjectId
+from pydantic import BaseModel
+from pymongo import MongoClient
+
+
+from pymongo import MongoClient
+
+# connection string gotten by Mongo Atlas
+connection_string = \
+    "mongodb+srv://renatamoon:264500@clusterlearning.b6jyp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+
+# passing it to a variable
+client = MongoClient(connection_string)
+
+# getting the database from MongoAtlas
+database = client['new_database']
+
+# getting the collection from MongoAtlas
+collection = database['products']
+
+
+# ---- Models
+
+# Model of the class Product
+class ProductSchema(BaseModel):
+    id: int
+    productTitle: str
+    productPrice: float
+    productDescription: str
+
+    class Config:
+        extra : "forbid"
+
+
+# ---- Helpers
+
+def product_helpers(product) -> dict:
+    return {
+        "id": int(product["_id"]),
+        "productTitle": str(product["productTitle"]),
+        "productPrice": float(product["productPrice"]),
+        "productDescription": str(product["productDescription"]),
+    }
 
 
 app = FastAPI()
@@ -24,11 +63,11 @@ async def retrieve_all_products():
 
 # GET A PRODUCT BY ID - endpoint to get a single article
 @app.get("/get-product{id}", tags=["Products"])
-async def get_an_products_by_id(id: int):
-    return {"searchedProduct": {id}}
+async def get_an_products_by_id():
+    pass
 
 
 # POST A PRODUCT - endpoint to create a new product on out database
 @app.post("/post-product", tags=["Product Registry"])
-async def add_product(product: Product):
-    return {"MESSAGE": "THE PRODUCT WAS ADDED WITH SUCCESS"}
+async def add_product():
+    pass
